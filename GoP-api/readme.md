@@ -42,8 +42,19 @@ This will start the servers.
 From Browser we can issue URL to test the service. 
 
 Create User: 
+```
+   curl -H "Content-Type: application/json" -X POST -d '{"name":"GOPLAY!","email":"rest@goplay.com"}' http://localhost:8080/users/
+```
 
 Delete User: 
+  Before deleting check if the id '2' is present either by checking the DB or by searching by id. 
+
+```
+ curl  -X DELETE  http://localhost:8080/users/2
+```
 
 Find User: 
 
+```
+curl  -X GET  http://localhost:8080/users/1
+```
