@@ -37,9 +37,9 @@ CREATE TABLE Persons
 
 $ mvn spring-boot:run
 
-This will start the servers. 
+This will start the servers. From Browser we can issue URL to test the service. 
 
-From Browser we can issue URL to test the service. 
+Command Line Test:  (We will be automating the unit test cases and also the curl test cases, Once the UI is ready we will be having integration test cases.)
 
 Create User: 
 ```
