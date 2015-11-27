@@ -18,7 +18,7 @@
 
 3) Create a Database goplay 
 ```
-   CREATE IF NOT EXISTS goplay; 
+   CREATE DATABASE IF NOT EXISTS goplay; 
 ```
 
 4) Create a Table users 
