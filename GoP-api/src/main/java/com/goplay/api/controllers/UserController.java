@@ -6,6 +6,10 @@ import java.util.Map;
 
 import com.goplay.api.models.User;
 import com.goplay.api.models.UserDao;
+import com.goplay.api.models.UserInfo;
+import com.goplay.api.models.UserInfoDao;
+import com.goplay.api.models.UserLogin;
+import com.goplay.api.models.UserLoginDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,14 +27,37 @@ public class UserController {
 
   @RequestMapping(method = RequestMethod.POST)
   public Map<String, Object> create(@RequestBody Map<String, Object> userMap) {
-     User user = null;
+     UserInfo user = null;
+     UserLogin userL = null;
       Map<String, Object> response = new LinkedHashMap<String, Object>();
      
       try {
-          user = new User(userMap.get("name").toString(),
-              userMap.get("email").toString()
+    	  
+    	  userL = new UserLogin(userMap.get("username").toString(), 
+        		  userMap.get("password").toString()
           );
-          userDao.save(user);
+          
+          userLoginDao.save(userL);
+          
+          
+          user = new UserInfo(userMap.get("username").toString(),
+              userMap.get("firstname").toString(),
+              userMap.get("lastname").toString(),
+              userMap.get("email").toString(),
+              userMap.get("phone").toString(),
+              userMap.get("address").toString(),
+              userMap.get("city").toString(),
+              userMap.get("state").toString(),
+              userMap.get("zipcode").toString()
+          );
+          userInfoDao.save(user);
+          
+          userL = new UserLogin(userMap.get("username").toString(), 
+        		  userMap.get("password").toString()
+          );
+          
+          userLoginDao.save(userL);
+          
       } catch (Exception ex) {
           response.put("message", "Error creating the user: " + ex.toString());
           return response;
@@ -38,9 +65,11 @@ public class UserController {
 
       response.put("message", "User created successfully");
       response.put("user", user);
+      response.put("user", userL);
       return response;
   }
   
+  /*
   @RequestMapping(method = RequestMethod.GET, value="/{id}")
   public User getUserById(@PathVariable("id") long id) {
       User user = null;
@@ -98,8 +127,14 @@ public class UserController {
     }
     return "User succesfully updated!";
   }
-  
+  */
   @Autowired
   private UserDao userDao;
+  
+  @Autowired
+  private UserInfoDao userInfoDao;
+  
+  @Autowired
+  private UserLoginDao userLoginDao;
   
 } 
