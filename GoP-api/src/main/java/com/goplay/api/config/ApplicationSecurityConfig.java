@@ -29,23 +29,7 @@ import com.goplay.api.models.UserLoginDao;
 @Configuration
 class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
  
-	
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-      http
-      .authorizeRequests()
-      .anyRequest().authenticated()
-      .and()
-      .requestCache()
-      .requestCache(new NullRequestCache())
-      .and()
-      .httpBasic();
-  }
-  
-  @Autowired
-  UserLoginDao userLogin;
-
-  
+ 
   @Bean
   public PasswordEncoder passwordEncoder() {
       return new BCryptPasswordEncoder();
@@ -57,37 +41,43 @@ class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
   }
  
-  
-  @Autowired 
-  UserDetailsService userDetailsService;
-  
-  
-  @Bean
-  protected UserDetailsService userDetailsService() {
-    return new UserDetailsService() {
- 
-      @Override
-      public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    	  
-        UserLogin user = userLogin.findByUsername(username);
-        if(user != null) {
-	        return new User(user.getUsername(), 
-	        				user.getPassword(), 
-	        				true, 
-	        				true, 
-	        				true, 
-	        				true,
-	        				AuthorityUtils.createAuthorityList("USER")
-	        		);
-	        	
-        } else {
-          throw new UsernameNotFoundException("could not find the user '"
-                  + username + "'");
-        }
-      }
-      
-    };
-  }
+
+	@Override
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+	
+	 @Autowired
+	  UserLoginDao userLogin;
+	  
+	  @Bean
+	  protected  UserDetailsService userDetailsService() {
+	    return new UserDetailsService() {
+	 
+	      @Override
+	      public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	    	  
+	        UserLogin user = userLogin.findByUsername(username);
+	        if(user != null) {
+		        return new User(user.getUsername(), 
+		        				user.getPassword(), 
+		        				true, 
+		        				true, 
+		        				true, 
+		        				true,
+		        				AuthorityUtils.createAuthorityList("USER")
+		        		);
+		        	
+	        } else {
+	          throw new UsernameNotFoundException("could not find the user '"
+	                  + username + "'");
+	        }
+	      }
+	      
+	    };
+	  }
+	  
   
  
 }
