@@ -10,6 +10,7 @@ import com.goplay.api.models.UserInfo;
 import com.goplay.api.models.UserInfoDao;
 import com.goplay.api.models.UserLogin;
 import com.goplay.api.models.UserLoginDao;
+import com.goplay.api.servcies.RegisterUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,25 +21,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
+	
+	@Autowired
+    private RegisterUserService userService;
 
-  @RequestMapping(method = RequestMethod.POST)
-  public Map<String, Object> create(@RequestBody Map<String, Object> userMap) {
+	@RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public String sayHello() {
+        return "Secure Hello!";
+    }
+	
+  @RequestMapping(value ="/register", method = RequestMethod.POST)
+  public Map<String, Object> registerUser(@RequestBody Map<String, Object> userMap) {
      UserInfo user = null;
      UserLogin userL = null;
       Map<String, Object> response = new LinkedHashMap<String, Object>();
-     
+    
       try {
     	  
     	  userL = new UserLogin(userMap.get("username").toString(), 
         		  userMap.get("password").toString()
           );
           
-          userLoginDao.save(userL);
-          
+    	  userService.registerUser(userL);
           
           user = new UserInfo(userMap.get("username").toString(),
               userMap.get("firstname").toString(),
@@ -52,11 +63,12 @@ public class UserController {
           );
           userInfoDao.save(user);
           
-          userL = new UserLogin(userMap.get("username").toString(), 
-        		  userMap.get("password").toString()
-          );
-          
-          userLoginDao.save(userL);
+          /*
+          userL = userLoginDao.save(new UserLogin(
+        		  		userMap.get("username").toString(), 
+        		  		userMap.get("password").toString()
+        		  ));
+          */
           
       } catch (Exception ex) {
           response.put("message", "Error creating the user: " + ex.toString());
@@ -64,12 +76,47 @@ public class UserController {
       }
 
       response.put("message", "User created successfully");
-      response.put("user", user);
-      response.put("user", userL);
+      response.put("userInfo", user);
+      response.put("userLogin", userL);
       return response;
   }
   
-  /*
+  @RequestMapping(method = RequestMethod.GET, value="/{username}/{password}")
+  public String getUserById(@PathVariable("username") String username,
+		  						@PathVariable("password") String password) {
+      UserLogin user = null;
+      try{
+         user =  userLoginDao.findByUsername(username);
+      } catch (Exception ex) {
+          return null;
+      } 
+      
+      if (userService.matchPassword(user.getPassword(), password)) {
+    	  return "authentication granted";
+      }
+      
+      return "Not Authorized";
+    
+  }
+  
+  
+  @RequestMapping(method = RequestMethod.POST, value="/authenticate")
+  public String validateUserLogin(@RequestBody UserLogin userRequest) {
+      UserLogin userRepo = null;
+      try{
+         userRepo =  userLoginDao.findByUsername(userRequest.getUsername());
+      } catch (Exception ex) {
+          return null;
+      } 
+      
+      if (userService.matchPassword(userRequest.getPassword(),userRepo.getPassword())) {
+    	  return "VALID : " + userRequest+"\n";
+      }
+      
+      return "InVALID : " + userRequest + "\n";
+    
+  }
+  
   @RequestMapping(method = RequestMethod.GET, value="/{id}")
   public User getUserById(@PathVariable("id") long id) {
       User user = null;
@@ -81,6 +128,7 @@ public class UserController {
       return user; 
   }
   
+  /*
   @RequestMapping("/by-email")
   @ResponseBody
   public User getUserByEmail(@RequestParam(value = "email") String email) {

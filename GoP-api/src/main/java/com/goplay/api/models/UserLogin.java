@@ -17,6 +17,7 @@ public class UserLogin {
 	private String password;
 	
 	
+	
 	UserLogin() {
 		
 	}
@@ -26,15 +27,17 @@ public class UserLogin {
 		this.password = password;
 	}
 	
-	
-	
-	
-	public String getPassword(String username) {
+	public String getPassword() {
 		return this.password;
 	}
 
+	
 	public void setPassword(String value) {
-		this.password = password;
+		this.password = value;
+	}
+	
+	public String getUsername() {
+		return this.username;
 	}
 	
 	public void setUserName(String username) {

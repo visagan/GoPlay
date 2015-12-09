@@ -16,7 +16,7 @@ import org.springframework.data.repository.CrudRepository;
 @Transactional
 public interface UserLoginDao extends CrudRepository<UserLogin, String> {
 
-  public UserInfo findByUsername(String username);
+  public UserLogin findByUsername(String username);
   
 
 }

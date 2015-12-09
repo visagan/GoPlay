@@ -81,4 +81,13 @@ public class UserInfo {
     this.username = value;
   }
   
+  
+  public String getPhone() {
+	    return phone;
+	  }
+	  
+	  public void setPhone(String value) {
+	    this.phone = value;
+	  }
+	  
 } 
